@@ -1,0 +1,8 @@
+.idea/*
+ApiGateway/.mvn/*
+ProductService/.mvn/*
+DiscoveryServer/.mvn/*
+
+
+
+
