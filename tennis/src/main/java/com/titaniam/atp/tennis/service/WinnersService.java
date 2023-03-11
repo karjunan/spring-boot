@@ -6,7 +6,7 @@ import java.util.List;
 import com.titaniam.atp.tennis.dto.WinnerNameAndTotalWinsDTO;
 import com.titaniam.atp.tennis.dto.WinnerNameAndTotalWinsForDurationDTO;
 import com.titaniam.atp.tennis.dto.WinnerNamesAndWinsDTO;
-import com.titaniam.atp.tennis.dto.model.WinnerNameAndTotalWinsModel;
+import com.titaniam.atp.tennis.dto.model.WinnerNameAndTotalWinsIDModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -27,7 +27,7 @@ public class WinnersService {
 
     public WinnerNameAndTotalWinsDTO getWinnerNamesAndFinalWins(String year, String surface) {
 
-        AggregationResults<WinnerNameAndTotalWinsModel> output = buildAggregation(year, null, surface);
+        AggregationResults<WinnerNameAndTotalWinsIDModel> output = buildAggregation(year, null, surface);
 
         WinnerNameAndTotalWinsDTO winnerNameAndTotalWinsDTO = new WinnerNameAndTotalWinsDTO();
         winnerNameAndTotalWinsDTO.setYear(year);
@@ -39,7 +39,7 @@ public class WinnersService {
 
     public WinnerNameAndTotalWinsForDurationDTO getWinnerNamesAndFinalWinsForSpecificYears(String fromYear, String toYear, String surface) {
 
-        AggregationResults<WinnerNameAndTotalWinsModel> output = buildAggregation(fromYear, toYear, surface);
+        AggregationResults<WinnerNameAndTotalWinsIDModel> output = buildAggregation(fromYear, toYear, surface);
         WinnerNameAndTotalWinsForDurationDTO winnerNameAndTotalWinsDTO = new WinnerNameAndTotalWinsForDurationDTO();
         winnerNameAndTotalWinsDTO.setFromYear(fromYear);
         winnerNameAndTotalWinsDTO.setToYear(toYear);
@@ -49,7 +49,7 @@ public class WinnersService {
         return winnerNameAndTotalWinsDTO;
     }
 
-    private AggregationResults<WinnerNameAndTotalWinsModel> buildAggregation(String fromYear, String toYear, String surface) {
+    private AggregationResults<WinnerNameAndTotalWinsIDModel> buildAggregation(String fromYear, String toYear, String surface) {
         Criteria surfaceCriteria = new Criteria("surface").is(surface);
         Criteria roundCriteria = new Criteria("round").is("F");
         List<Criteria> list = new ArrayList<>();
@@ -70,17 +70,17 @@ public class WinnersService {
                 = Aggregation.newAggregation(matchStage, groupWinnerNames);
 
 
-        AggregationResults<WinnerNameAndTotalWinsModel> output
-                = mongoTemplate.aggregate(winnerAggregation, "tennis", WinnerNameAndTotalWinsModel.class);
+        AggregationResults<WinnerNameAndTotalWinsIDModel> output
+                = mongoTemplate.aggregate(winnerAggregation, "tennis", WinnerNameAndTotalWinsIDModel.class);
 
         log.info("Total document for the ouput => " + output.getMappedResults().size());
         return output;
     }
 
-    private List<WinnerNamesAndWinsDTO> setDataToDTO(AggregationResults<WinnerNameAndTotalWinsModel> output) {
+    private List<WinnerNamesAndWinsDTO> setDataToDTO(AggregationResults<WinnerNameAndTotalWinsIDModel> output) {
 
         List<WinnerNamesAndWinsDTO> list = new ArrayList<>();
-        for (WinnerNameAndTotalWinsModel model : output.getMappedResults()) {
+        for (WinnerNameAndTotalWinsIDModel model : output.getMappedResults()) {
             WinnerNamesAndWinsDTO winnerNamesAndWinsDTO = new WinnerNamesAndWinsDTO();
             winnerNamesAndWinsDTO.setName(model.getId().getWinner_name());
             winnerNamesAndWinsDTO.setCount(model.getCount());
