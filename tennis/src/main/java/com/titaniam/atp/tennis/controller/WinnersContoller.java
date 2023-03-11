@@ -25,6 +25,6 @@ public class WinnersContoller {
     @GetMapping("/{fromYear}/{toYear}/{surface}")
     public WinnerNameAndTotalWinsForDurationDTO getUniquePlayersByCountryForSpecificDuration(@PathVariable String fromYear, @PathVariable String toYear, @PathVariable String surface) {
 
-        return winnersService.getWinnerNamesAndFinalWinsForSpecificYears(fromYear,toYear, surface);
+        return winnersService.getWinnerNamesAndFinalWinsForSpecificYears(fromYear, toYear, surface);
     }
 }

@@ -9,8 +9,6 @@ import java.util.Set;
 
 import com.titaniam.atp.tennis.dto.GrandSlamDTO;
 import com.titaniam.atp.tennis.dto.GrandSlamWinnersDTO;
-import com.titaniam.atp.tennis.dto.WinnerNameAndTotalWinsForDurationDTO;
-import com.titaniam.atp.tennis.dto.WinnerNamesAndWinsDTO;
 import com.titaniam.atp.tennis.dto.model.GrandSlamWinnersModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +38,7 @@ public class GrandSlamService {
     private GrandSlamDTO buildAggregation(String fromYear, String toYear) {
 
         Criteria roundCriteria = new Criteria("round").is("F");
-        Criteria grandSlamCriteria = new Criteria("tourney_name").in("US Open", "Wimbledon","Australian Open", "Roland Garros");
+        Criteria grandSlamCriteria = new Criteria("tourney_name").in("US Open", "Wimbledon", "Australian Open", "Roland Garros");
 
         List<Criteria> list = new ArrayList<>();
         list.add(roundCriteria);
@@ -48,7 +46,7 @@ public class GrandSlamService {
         MatchOperation matchStage = Aggregation.match(new Criteria("year").gte(fromYear).lte(toYear).andOperator(list));
 
 
-        GroupOperation groupWinnerNames = Aggregation.group("tourney_name", "winner_id", "winner_name","round")
+        GroupOperation groupWinnerNames = Aggregation.group("tourney_name", "winner_id", "winner_name", "round")
                 .count().as("count");
 
         Aggregation winnerAggregation
@@ -73,7 +71,7 @@ public class GrandSlamService {
         for (GrandSlamWinnersModel model : output.getMappedResults()) {
             String key = model.getId().getWinner_id();
             String value = model.getId().getTourney_name();
-            if(!winnerMap.containsKey(key)) {
+            if (!winnerMap.containsKey(key)) {
                 Set<String> ls = new HashSet<>();
                 ls.add(value);
                 winnerMap.put(key, ls);
@@ -81,7 +79,7 @@ public class GrandSlamService {
                 Set<String> ls1 = winnerMap.get(key);
                 ls1.add(value);
                 winnerMap.put(key, ls1);
-                if(ls1.size() >= 4) {
+                if (ls1.size() >= 4) {
                     GrandSlamWinnersDTO grandSlamWinnersDTO = new GrandSlamWinnersDTO();
                     grandSlamWinnersDTO.setName(model.getId().getWinner_name());
                     list.add(grandSlamWinnersDTO);
