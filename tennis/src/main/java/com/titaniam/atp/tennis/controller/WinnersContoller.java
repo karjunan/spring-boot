@@ -1,6 +1,7 @@
 package com.titaniam.atp.tennis.controller;
 
 import com.titaniam.atp.tennis.dto.WinnerNameAndTotalWinsDTO;
+import com.titaniam.atp.tennis.dto.WinnerNameAndTotalWinsForDurationDTO;
 import com.titaniam.atp.tennis.service.WinnersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,5 +20,11 @@ public class WinnersContoller {
     public WinnerNameAndTotalWinsDTO getUniquePlayersByCountry(@PathVariable String year, @PathVariable String surface) {
 
         return winnersService.getWinnerNamesAndFinalWins(year, surface);
+    }
+
+    @GetMapping("/{fromYear}/{toYear}/{surface}")
+    public WinnerNameAndTotalWinsForDurationDTO getUniquePlayersByCountryForSpecificDuration(@PathVariable String fromYear, @PathVariable String toYear, @PathVariable String surface) {
+
+        return winnersService.getWinnerNamesAndFinalWinsForSpecificYears(fromYear,toYear, surface);
     }
 }
