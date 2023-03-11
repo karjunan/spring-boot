@@ -5,7 +5,7 @@ server:
     key-store-type: JKS
     key-store-password: password
 
-  port: 443
+  port: 8081
 encryption:
   rsa:
     publickey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmPO93yLZ1mQSv3QSnJ8makU4ySPFRBmqw+fiUcGh9COzBIOw41sHS3WnH5p0DqjTEXEoSbU2LNolYmXZuP61IIb9A/8SMLJHLMVOsgdJOXhy5jJFAkvmp6JPB25cYig5XIuSSa58K6Da7yHOPABl3x5+8blWeH/nv1l4qrvbsikGTglh3nn+sbMQGUH2/K5sWazcqmCneo/rAZuqWbEds2+k+vypDFfWhBkuY2s14OTRxGU6stAqcLIGlfJevjx1Toju5teJHIhRV2o/DbbYg5DS0/lp+L8O0pNXOgr/6XVX0Td24BxKO2WNPjmB4QDcNpsJfHh8PGQwVs4arGdIaQIDAQAB

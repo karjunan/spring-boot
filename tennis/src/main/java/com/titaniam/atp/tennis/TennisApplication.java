@@ -1,14 +1,13 @@
-package com.example.springboothttps;
+package com.titaniam.atp.tennis;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringbootHttpsApplication {
+public class TennisApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringbootHttpsApplication.class, args);
+		SpringApplication.run(TennisApplication.class, args);
 	}
 
 }
-
