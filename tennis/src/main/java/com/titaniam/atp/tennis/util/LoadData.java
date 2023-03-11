@@ -27,7 +27,7 @@ public class LoadData {
     @Autowired
     private TennisRepository tennisRepository;
 
-    @PostConstruct
+    //@PostConstruct
     private void postConstruct() throws IOException {
 
         File folder = ResourceUtils.getFile("classpath:atp_matches");
@@ -60,12 +60,11 @@ public class LoadData {
     }
 
     private boolean isDataAlreadyInserted(TennisDAO tennisDAO) {
-        try {
-            tennisRepository.save(tennisDAO);
-        } catch (Exception ex) {
+
+        if(tennisRepository.findById(tennisDAO.getTourney_id()).isEmpty()) {
             return false;
         }
-        return true;
+       return true;
     }
 
     private void saveData(List<TennisDAO> tennislist) {
@@ -110,6 +109,8 @@ public class LoadData {
         tennisDAO.setScore(d[23]);
         tennisDAO.setBest_of(d[24]);
         tennisDAO.setRound(d[25]);
+        String[] splitYear = d[0].split("-");
+        tennisDAO.setYear(splitYear[0]);
         return  tennisDAO;
     }
 

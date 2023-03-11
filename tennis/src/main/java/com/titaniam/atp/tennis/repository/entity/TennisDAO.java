@@ -42,4 +42,5 @@ public class TennisDAO {
     private String score;
     private String best_of;
     private String round;
+    private String year;
 }
