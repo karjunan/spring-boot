@@ -1,14 +1,13 @@
 package com.titaniam.atp.tennis.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import com.titaniam.atp.tennis.dto.CountryPlayersDTO;
 import com.titaniam.atp.tennis.dto.WinnerNameAndTotalWinsDTO;
+import com.titaniam.atp.tennis.dto.WinnerNamesAndWinsDTO;
 import com.titaniam.atp.tennis.dto.model.CountryPlayerModel;
-import com.titaniam.atp.tennis.dto.model.WinnerNameAndTotalWins;
+import com.titaniam.atp.tennis.dto.model.WinnerNameAndRoundModel;
+import com.titaniam.atp.tennis.dto.model.WinnerNameAndTotalWinsModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -42,22 +41,29 @@ public class WinnersService {
                 = Aggregation.newAggregation(matchStage, groupWinnerNames);
 
 
-        AggregationResults<CountryPlayerModel> output
-                = mongoTemplate.aggregate(winnerAggregation, "tennis", CountryPlayerModel.class);
+        AggregationResults<WinnerNameAndTotalWinsModel> output
+                = mongoTemplate.aggregate(winnerAggregation, "tennis", WinnerNameAndTotalWinsModel.class);
 
         log.info("Total document for the ouput => " + output.getMappedResults().size());
 
 
-        return setDataToDTO(output);
+        return setDataToDTO(output, year, surface);
     }
 
-    public WinnerNameAndTotalWinsDTO setDataToDTO(AggregationResults<CountryPlayerModel> output) {
+    public WinnerNameAndTotalWinsDTO setDataToDTO(AggregationResults<WinnerNameAndTotalWinsModel> output, String year, String surface) {
 
-        for(CountryPlayerModel model: output.getMappedResults()) {
-
+        WinnerNameAndTotalWinsDTO winnerNameAndTotalWinsDTO = new WinnerNameAndTotalWinsDTO();
+        winnerNameAndTotalWinsDTO.setYear(year);
+        winnerNameAndTotalWinsDTO.setSurface(surface);
+        List<WinnerNamesAndWinsDTO> list = new ArrayList<>();
+        for(WinnerNameAndTotalWinsModel model: output.getMappedResults()) {
+            WinnerNamesAndWinsDTO winnerNamesAndWinsDTO = new WinnerNamesAndWinsDTO();
+            winnerNamesAndWinsDTO.setName(model.getId().getWinner_name());
+            winnerNamesAndWinsDTO.setCount(model.getCount());
+            list.add(winnerNamesAndWinsDTO);
         }
-
-        return null;
+        winnerNameAndTotalWinsDTO.setWinners(list);
+        return winnerNameAndTotalWinsDTO;
     }
 
 }

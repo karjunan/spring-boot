@@ -15,10 +15,6 @@ public class WinnerNameAndTotalWinsDTO {
 
     private String year;
     private String surface;
-    private List<WinnerNamesAndWins> winners;
+    private List<WinnerNamesAndWinsDTO> winners;
 
-    static class WinnerNamesAndWins {
-        private String name;
-        private String count;
-    }
 }

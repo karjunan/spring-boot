@@ -1,4 +1,4 @@
-package com.titaniam.atp.tennis.dto.model;
+package com.titaniam.atp.tennis.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,9 +9,8 @@ import org.springframework.stereotype.Component;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class WinnerNameAndTotalWins {
+public class WinnerNamesAndWinsDTO {
 
-    private String id;
+    private String name;
     private int count;
-
 }
