@@ -9,7 +9,6 @@ import java.util.List;
 
 import com.titaniam.atp.tennis.repository.TennisRepository;
 import com.titaniam.atp.tennis.repository.entity.TennisDAO;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.BulkOperations;

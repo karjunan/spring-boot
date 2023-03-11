@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.mongodb.internal.operation.DistinctOperation;
 import com.titaniam.atp.tennis.dto.CountryPlayersDTO;
 import com.titaniam.atp.tennis.dto.model.CountryPlayerModel;
 import com.titaniam.atp.tennis.repository.TennisRepository;
@@ -21,31 +20,28 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class TennisService {
-
-    @Autowired
-    private TennisRepository tennisRepository;
+public class CountryService {
 
     @Autowired
     private MongoTemplate mongoTemplate;
 
     public List<CountryPlayersDTO> getUniquePlayersByCountry(String year) {
         MatchOperation matchStage = Aggregation.match(new Criteria("year").is(year));
-        GroupOperation groupDistinctWinner = Aggregation.group("winner_ioc","winner_id")
+        GroupOperation groupDistinctWinner = Aggregation.group("winner_ioc", "winner_id")
                 .count().as("count");
         GroupOperation groupWinner = Aggregation.group("winner_ioc")
                 .count().as("count");
 
-        GroupOperation groupDistinctLoser = Aggregation.group("loser_ioc","loser_id")
+        GroupOperation groupDistinctLoser = Aggregation.group("loser_ioc", "loser_id")
                 .count().as("count");
         GroupOperation groupLoser = Aggregation.group("loser_ioc")
                 .count().as("count");
 
         Aggregation winnerAggregation
-                = Aggregation.newAggregation(matchStage,groupDistinctWinner, groupWinner);
+                = Aggregation.newAggregation(matchStage, groupDistinctWinner, groupWinner);
 
         Aggregation loserAggregation
-                = Aggregation.newAggregation(matchStage,groupDistinctLoser, groupLoser);
+                = Aggregation.newAggregation(matchStage, groupDistinctLoser, groupLoser);
 
 
         AggregationResults<CountryPlayerModel> output//60
@@ -58,14 +54,14 @@ public class TennisService {
         log.info("Total document for the ouput => " + output1.getMappedResults().size());
 
         Map<String, Integer> map = new HashMap<>();
-        for(CountryPlayerModel model: output1.getMappedResults()) {
+        for (CountryPlayerModel model : output1.getMappedResults()) {
             map.put(model.getId(), Integer.parseInt(model.getCount()));
         }
 
-        for(CountryPlayerModel model: output.getMappedResults()) {
+        for (CountryPlayerModel model : output.getMappedResults()) {
             String id = model.getId();
             int count = Integer.parseInt(model.getCount());
-            if(!map.containsKey(id)) {
+            if (!map.containsKey(id)) {
                 map.put(id, count);
             } else {
                 map.put(model.getId(), count + map.get(id));
@@ -75,11 +71,9 @@ public class TennisService {
         return setResultToDTO(map);
     }
 
-
-
     private List<CountryPlayersDTO> setResultToDTO(Map<String, Integer> map) {
-        List<CountryPlayersDTO> list  = new ArrayList<>();
-        for(Map.Entry<String, Integer> entry: map.entrySet()) {
+        List<CountryPlayersDTO> list = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
             CountryPlayersDTO countryPlayersDTO = new CountryPlayersDTO();
             countryPlayersDTO.setCountry(entry.getKey());
             countryPlayersDTO.setCount(entry.getValue());
