@@ -5,8 +5,6 @@ import java.util.List;
 
 import com.titaniam.atp.tennis.dto.WinnerNameAndTotalWinsDTO;
 import com.titaniam.atp.tennis.dto.WinnerNamesAndWinsDTO;
-import com.titaniam.atp.tennis.dto.model.CountryPlayerModel;
-import com.titaniam.atp.tennis.dto.model.WinnerNameAndRoundModel;
 import com.titaniam.atp.tennis.dto.model.WinnerNameAndTotalWinsModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +54,7 @@ public class WinnersService {
         winnerNameAndTotalWinsDTO.setYear(year);
         winnerNameAndTotalWinsDTO.setSurface(surface);
         List<WinnerNamesAndWinsDTO> list = new ArrayList<>();
-        for(WinnerNameAndTotalWinsModel model: output.getMappedResults()) {
+        for (WinnerNameAndTotalWinsModel model : output.getMappedResults()) {
             WinnerNamesAndWinsDTO winnerNamesAndWinsDTO = new WinnerNamesAndWinsDTO();
             winnerNamesAndWinsDTO.setName(model.getId().getWinner_name());
             winnerNamesAndWinsDTO.setCount(model.getCount());

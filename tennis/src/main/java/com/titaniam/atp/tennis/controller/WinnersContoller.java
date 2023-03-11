@@ -1,8 +1,5 @@
 package com.titaniam.atp.tennis.controller;
 
-import java.util.List;
-
-import com.titaniam.atp.tennis.dto.CountryPlayersDTO;
 import com.titaniam.atp.tennis.dto.WinnerNameAndTotalWinsDTO;
 import com.titaniam.atp.tennis.service.WinnersService;
 import org.springframework.beans.factory.annotation.Autowired;

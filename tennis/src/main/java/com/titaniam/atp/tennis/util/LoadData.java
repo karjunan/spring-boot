@@ -34,7 +34,7 @@ public class LoadData {
         for (File file : listOfFiles) {
             List<TennisDAO> list = readFile(file.getAbsolutePath());
             // check if the values were already inserted in the db . if so, move one
-            if(!list.isEmpty() && isDataAlreadyInserted(list.get(0))) {
+            if (!list.isEmpty() && isDataAlreadyInserted(list.get(0))) {
                 continue;
             }
             saveData(list);
@@ -55,15 +55,15 @@ public class LoadData {
                 val += 1;
             }
         }
-       return list;
+        return list;
     }
 
     private boolean isDataAlreadyInserted(TennisDAO tennisDAO) {
 
-        if(tennisRepository.findById(tennisDAO.getTourney_id()).isEmpty()) {
+        if (tennisRepository.findById(tennisDAO.getTourney_id()).isEmpty()) {
             return false;
         }
-       return true;
+        return true;
     }
 
     private void saveData(List<TennisDAO> tennislist) {
@@ -82,7 +82,7 @@ public class LoadData {
     private TennisDAO buildData(String data) {
         String[] d = data.split(",");
         TennisDAO tennisDAO = new TennisDAO();
-        tennisDAO.setTourney_id(d[0]+"-"+d[6]);
+        tennisDAO.setTourney_id(d[0] + "-" + d[6]);
         tennisDAO.setTourney_name(d[1]);
         tennisDAO.setSurface(d[2]);
         tennisDAO.setDraw_size(d[3]);
@@ -110,7 +110,7 @@ public class LoadData {
         tennisDAO.setRound(d[25]);
         String[] splitYear = d[0].split("-");
         tennisDAO.setYear(splitYear[0]);
-        return  tennisDAO;
+        return tennisDAO;
     }
 
 }

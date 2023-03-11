@@ -7,7 +7,6 @@ import java.util.Map;
 
 import com.titaniam.atp.tennis.dto.CountryPlayersDTO;
 import com.titaniam.atp.tennis.dto.model.CountryPlayerModel;
-import com.titaniam.atp.tennis.repository.TennisRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
