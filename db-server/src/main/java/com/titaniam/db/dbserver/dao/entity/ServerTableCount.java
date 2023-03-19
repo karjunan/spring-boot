@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-//@Entity(name = "server_table_count")
 public class ServerTableCount {
 
     @Id
