@@ -57,25 +57,45 @@ public class DbService {
         return insertRecordIntoHostTable(table_name + "_" + tableCount, server);
     }
 
-    public DbDTO getHost(String id) {
+    public DbDTO getHost(String id) throws Exception {
+        String tableName = splitAndGetTableName(id);
+        String query = "select * from " + tableName + " where id = ?";
+        Object[] args = {id};
+        int[] argTypes = {Types.VARCHAR};
+
+        try {
+             return jdbcTemplate.queryForObject(query, args, argTypes, (rs, num) -> {
+                Server p = new Server(rs.getString(1), rs.getString(2),
+                        rs.getString(3), rs.getString(4), rs.getString(5));
+                 DbDTO dbDTO = new DbDTO();
+                 dbDTO.setHost(p.getHost());
+                dbDTO.setDate(p.getDate());
+                dbDTO.setMessage(p.getMessage());
+                dbDTO.setTime(p.getTime());
+                return dbDTO;
+            });
+        } catch (Exception ex) {
+            log.info("Exception while getting the object  "+ ex);
+            throw new Exception("No element found");
+        }
+    }
+
+    public int deleteHost(String id) {
+        String tableName = splitAndGetTableName(id);
+        String query = "delete from " + tableName + " where id = ?";
+        Object[] args = {id};
+        int[] argTypes = {Types.VARCHAR};
+        int rows = jdbcTemplate.update(query,args, argTypes);
+        return rows;
+    }
+
+    private String splitAndGetTableName(String id) {
         String[] splitString = id.split("_");
         String server_name = splitString[0];
         String date = splitString[1]+"_"+splitString[2]+"_"+splitString[3];
         String position = splitString[4];
         String tableName = server_name+"_"+date+"_"+position;
-        String query = "select * from " + tableName + " where id = ?";
-        Object[] args = {id};
-        int[] argTypes = {Types.VARCHAR};
-        return jdbcTemplate.queryForObject(query, args, argTypes, (rs, num) -> {
-            Server p = new Server(rs.getString(1), rs.getString(2),
-                    rs.getString(3), rs.getString(4),rs.getString(5));
-            DbDTO dbDTO = new DbDTO();
-            dbDTO.setHost(p.getHost());
-            dbDTO.setDate(p.getDate());
-            dbDTO.setMessage(p.getMessage());
-            dbDTO.setTime(p.getTime());
-            return dbDTO;
-        });
+        return tableName;
     }
 
     private String insertRecordIntoHostTable(String table_name, Server server) {
