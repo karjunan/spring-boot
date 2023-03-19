@@ -21,8 +21,7 @@ public class DbController {
     @PostMapping("/data")
     public String createServerMessage(@RequestBody DbDTO dbDTO) {
         log.info("controller input " + dbDTO);
-        dbService.createHost(dbDTO);
-        return "hello krishna";
+        return dbService.createHost(dbDTO);
     }
 
 }

@@ -9,19 +9,22 @@ import com.titaniam.db.dbserver.dto.DbDTO;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 public class DbService {
 
+    @Value("${tableSize}")
+    private String tableSize;
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Transactional
-    public void createHost(DbDTO dbDTO) {
+    public String createHost(DbDTO dbDTO) {
         log.info("service input " + dbDTO);
         Server server = new Server();
         server.setHost(dbDTO.getHost());
@@ -37,25 +40,29 @@ public class DbService {
             insertOrUpdateCountIntoTable(table_name, tableCount);
         } else {
             int dataCount = getDataCount(table_name + "_" + tableCount);
-            if(dataCount > 3) {
-                try {
+            try {
+                if (dataCount > Integer.parseInt(tableSize)) {
                     createNewTable(table_name, Integer.toString(tableCount + 1));
-                } catch (Exception ex) {
-                    log.info("Table already exists");
+                    insertOrUpdateCountIntoTable(table_name, tableCount + 1);
+                    tableCount += 1;
                 }
                 log.info("Data count " + dataCount);
-                insertOrUpdateCountIntoTable(table_name,  tableCount+1);
-                tableCount += 1;
+            } catch (NumberFormatException ex) {
+                log.info("Issue while parsing the number");
+                return null;
+            } catch (Exception ex) {
+                log.info("Table already exists");
             }
         }
-        insertRecordIntoHostTable(table_name+"_"+tableCount, server);
+        return insertRecordIntoHostTable(table_name + "_" + tableCount, server);
     }
 
-    private void insertRecordIntoHostTable(String table_name, Server server) {
+    private String insertRecordIntoHostTable(String table_name, Server server) {
         String query = "insert into " + table_name + " values (?, ? , ? , ?, ? )";
         String uuid = UUID.randomUUID().toString();
-        String id = table_name+"_"+uuid;
-        jdbcTemplate.update(query, id, server.getHost(), server.getMessage(), server.getDate(),server.getTime());
+        String id = table_name + "_" + uuid;
+        jdbcTemplate.update(query, id, server.getHost(), server.getMessage(), server.getDate(), server.getTime());
+        return id;
     }
 
     private void insertOrUpdateCountIntoTable(String table_name, int count) {
@@ -71,7 +78,7 @@ public class DbService {
     }
 
     private int getDataCount(String table_name) {
-        return jdbcTemplate.queryForObject("select count(*) from "+ table_name, Integer.class);
+        return jdbcTemplate.queryForObject("select count(*) from " + table_name, Integer.class);
     }
 
     private void createNewTable(String table_name, String count) {
@@ -91,12 +98,12 @@ public class DbService {
     private int getTableCount(String table_name) {
         try {
             String query = "select * from server_table_name where table_name = ?";
-             Object[] args = { table_name };
-            int[] argTypes = { Types.VARCHAR };
+            Object[] args = {table_name};
+            int[] argTypes = {Types.VARCHAR};
             return jdbcTemplate.queryForObject(query, args, argTypes, (rs, num) -> {
-                    ServerTableCount p = new ServerTableCount(rs.getString(1), rs.getString(2),
-                            rs.getInt(3));
-                    return p.getCount();
+                ServerTableCount p = new ServerTableCount(rs.getString(1), rs.getString(2),
+                        rs.getInt(3));
+                return p.getCount();
             });
         } catch (Exception ex) {
             return -1;
