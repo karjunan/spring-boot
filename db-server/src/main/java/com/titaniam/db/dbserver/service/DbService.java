@@ -1,7 +1,16 @@
 package com.titaniam.db.dbserver.service;
 
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import com.titaniam.db.dbserver.dao.entity.Server;
 import com.titaniam.db.dbserver.dao.entity.ServerTableCount;
@@ -33,16 +42,17 @@ public class DbService {
         server.setTime(dbDTO.getTime());
         String table_name = buildTableName(server);
 
+
         int tableCount = getTableCount(table_name);
         if (tableCount == -1) {
             tableCount += 1;
-            createNewTable(table_name, Integer.toString(tableCount));
+            createNewTable(table_name, tableCount);
             insertOrUpdateCountIntoTable(table_name, tableCount);
         } else {
             int dataCount = getDataCount(table_name + "_" + tableCount);
             try {
                 if (dataCount > Integer.parseInt(tableSize)) {
-                    createNewTable(table_name, Integer.toString(tableCount + 1));
+                    createNewTable(table_name, tableCount + 1);
                     insertOrUpdateCountIntoTable(table_name, tableCount + 1);
                     tableCount += 1;
                 }
@@ -57,6 +67,7 @@ public class DbService {
         return insertRecordIntoHostTable(table_name + "_" + tableCount, server);
     }
 
+
     public DbDTO getHost(String id) throws Exception {
         String tableName = splitAndGetTableName(id);
         String query = "select * from " + tableName + " where id = ?";
@@ -64,18 +75,18 @@ public class DbService {
         int[] argTypes = {Types.VARCHAR};
 
         try {
-             return jdbcTemplate.queryForObject(query, args, argTypes, (rs, num) -> {
+            return jdbcTemplate.queryForObject(query, args, argTypes, (rs, num) -> {
                 Server p = new Server(rs.getString(1), rs.getString(2),
                         rs.getString(3), rs.getString(4), rs.getString(5));
-                 DbDTO dbDTO = new DbDTO();
-                 dbDTO.setHost(p.getHost());
+                DbDTO dbDTO = new DbDTO();
+                dbDTO.setHost(p.getHost());
                 dbDTO.setDate(p.getDate());
                 dbDTO.setMessage(p.getMessage());
                 dbDTO.setTime(p.getTime());
                 return dbDTO;
             });
         } catch (Exception ex) {
-            log.info("Exception while getting the object  "+ ex);
+            log.info("Exception while getting the object  " + ex);
             throw new Exception("No element found");
         }
     }
@@ -85,16 +96,81 @@ public class DbService {
         String query = "delete from " + tableName + " where id = ?";
         Object[] args = {id};
         int[] argTypes = {Types.VARCHAR};
-        int rows = jdbcTemplate.update(query,args, argTypes);
+        int rows = jdbcTemplate.update(query, args, argTypes);
         return rows;
     }
+
+    public List<DbDTO> getServerByHostAndDate(String host, String date) throws ExecutionException, InterruptedException, TimeoutException {
+        Server server = new Server();
+        server.setHost(host);
+        server.setDate(date);
+        String tableName = buildTableName(server);
+        int noOfTables = getTableCount(tableName);
+        List<CompletableFuture<List<DbDTO>>> list = new ArrayList<>();
+        ExecutorService service = Executors.newCachedThreadPool();
+        for (int i = 0; i <= noOfTables; i++) {
+            String tableNameWithIndex = tableName + "_" + i;
+            CompletableFuture<List<DbDTO>> future = CompletableFuture.supplyAsync(() -> {
+                try {
+                    String query = "select * from " + tableNameWithIndex + " where host = ? and date = ?";
+                    Object[] args = {host, date};
+                    int[] argTypes = {Types.VARCHAR, Types.VARCHAR};
+                    try {
+                        List<DbDTO> ls = jdbcTemplate.query(query, args, argTypes, (rs, num) -> {
+                            Server p = new Server(rs.getString(1), rs.getString(2),
+                                    rs.getString(3), rs.getString(4), rs.getString(5));
+                            DbDTO dbDTO = new DbDTO();
+                            dbDTO.setHost(p.getHost());
+                            dbDTO.setDate(p.getDate());
+                            dbDTO.setMessage(p.getMessage());
+                            dbDTO.setTime(p.getTime());
+                            return dbDTO;
+                        });
+                    } catch (Exception ex) {
+                        log.info("Exception while getting the object  " + ex);
+                        throw new Exception("No element found");
+                    }
+                } catch (Exception e) {
+                    log.info("Exception while getting data " + e);
+                }
+                return null;
+            }, service);
+            list.add(future);
+        }
+
+//        CompletableFuture<Void> resultantCf = CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()]));
+        CompletableFuture<Void> resultantCf = CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()]));
+
+//        CompletableFuture<List<DbDTO>> allCompletableFuture = resultantCf.thenApply(future -> {
+//            return list.stream()
+//                    .map(completableFuture -> completableFuture.join())
+//                    .collect(Collectors.toList());
+//        });
+
+//                .thenApply(t -> list.stream().map(CompletableFuture::join).collect(Collectors.toList()));
+
+//        CompletableFuture<List<DbDTO>> allFutureResults = sequence(list);
+
+        List<DbDTO> resultList = allFutureResults.get(100000, TimeUnit.MILLISECONDS);
+
+        return resultList;
+    }
+
+    static <T> CompletableFuture<List<T>> sequence(List<CompletableFuture<T>> com) {
+        return CompletableFuture.allOf(com.toArray(new CompletableFuture[com.size()]))
+                .thenApply(v -> com.stream()
+                        .map(CompletableFuture::join)
+                        .collect(Collectors.toList())
+                );
+    }
+
 
     private String splitAndGetTableName(String id) {
         String[] splitString = id.split("_");
         String server_name = splitString[0];
-        String date = splitString[1]+"_"+splitString[2]+"_"+splitString[3];
+        String date = splitString[1] + "_" + splitString[2] + "_" + splitString[3];
         String position = splitString[4];
-        String tableName = server_name+"_"+date+"_"+position;
+        String tableName = server_name + "_" + date + "_" + position;
         return tableName;
     }
 
@@ -122,9 +198,8 @@ public class DbService {
         return jdbcTemplate.queryForObject("select count(*) from " + table_name, Integer.class);
     }
 
-    private void createNewTable(String table_name, String count) {
+    private void createNewTable(String table_name, int count) {
         String name = table_name + "_" + count;
-        System.out.println(name);
         String queryCreateTable = "CREATE TABLE " + name +
                 "(id VARCHAR(100) NOT NULL ," +
                 "host VARCHAR(100)," +
