@@ -1,4 +1,4 @@
-package com.titaniam.db.dbserver.dto;
+package com.titaniam.db.dbserver.query.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,11 +7,11 @@ import lombok.ToString;
 import org.springframework.stereotype.Component;
 
 @Component
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class DbDTO {
+@Data
+public class DBQueryDTO {
 
     private String host;
     private String message;

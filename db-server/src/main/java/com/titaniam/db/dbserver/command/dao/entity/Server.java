@@ -1,4 +1,4 @@
-package com.titaniam.db.dbserver.dao.entity;
+package com.titaniam.db.dbserver.command.dao.entity;
 
 import java.io.Serializable;
 
