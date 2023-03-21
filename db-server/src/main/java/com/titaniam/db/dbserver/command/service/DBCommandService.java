@@ -1,10 +1,12 @@
 package com.titaniam.db.dbserver.command.service;
 
 import java.sql.Types;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import com.titaniam.db.dbserver.command.dao.entity.Server;
 import com.titaniam.db.dbserver.command.dto.DbCommandDTO;
+import com.titaniam.db.dbserver.exception.TableAlreadyExistsException;
 import com.titaniam.db.dbserver.query.service.DbQueryService;
 import com.titaniam.db.dbserver.util.DbUtil;
 import jakarta.transaction.Transactional;
@@ -52,26 +54,26 @@ public class DBCommandService {
                     tableCount += 1;
                 }
                 log.info("Data count " + dataCount);
-            } catch (NumberFormatException ex) {
-                log.info("Issue while parsing the number");
-                return null;
             } catch (Exception ex) {
                 log.info("Table already exists");
+                throw new TableAlreadyExistsException("Table already exists");
             }
         }
         return insertRecordIntoHostTable(table_name + "_" + tableCount, server);
     }
 
-    public int deleteHost(String id) {
+    @Transactional
+    public int deleteHost(String id) throws Exception {
         String tableName = DbUtil.splitAndGetTableName(id);
         String query = "delete from " + tableName + " where id = ?";
         Object[] args = {id};
         int[] argTypes = {Types.VARCHAR};
         int rows = jdbcTemplate.update(query, args, argTypes);
+        if (rows == 0) {
+            throw new NoSuchElementException("Element Not found");
+        }
         return rows;
     }
-
-
 
 
     private void createNewTable(String table_name, int count) {

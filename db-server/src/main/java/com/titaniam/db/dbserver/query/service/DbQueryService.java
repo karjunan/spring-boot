@@ -3,17 +3,15 @@ package com.titaniam.db.dbserver.query.service;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import com.titaniam.db.dbserver.command.dao.entity.ServerTableCount;
 import com.titaniam.db.dbserver.query.dao.entity.ServerQuery;
-import com.titaniam.db.dbserver.command.dto.DbCommandDTO;
 import com.titaniam.db.dbserver.query.dto.DBQueryDTO;
 import com.titaniam.db.dbserver.util.DbUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +47,7 @@ public class DbQueryService {
             });
         } catch (Exception ex) {
             log.info("Exception while getting the object  " + ex);
-            throw new Exception("No element found");
+            throw new NoSuchElementException("No element found");
         }
     }
 
