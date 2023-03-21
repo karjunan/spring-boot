@@ -55,7 +55,7 @@ public class DbQueryService {
 
 
 
-    public List<DBQueryDTO> getServerByHostAndDate(String host, String date) throws ExecutionException, InterruptedException, TimeoutException {
+    public List<DBQueryDTO> getServerByHostAndDate(String host, String date) throws Exception {
         ServerQuery server = new ServerQuery();
         server.setHost(host);
         server.setDate(date);
@@ -92,17 +92,12 @@ public class DbQueryService {
             }, service);
             list.add(future);
         }
-
-//        CompletableFuture<Void> resultantCf = CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()]));
-//        CompletableFuture<List<List<DbDTO>>> result =
-//                resultantCf.thenApply(t -> list.stream().map(CompletableFuture::join).collect(Collectors.toList()));
-
         CompletableFuture<List<List<DBQueryDTO>>> result = sequence(list);
         List<List<DBQueryDTO>> resultList = result.get(1000, TimeUnit.MILLISECONDS);
         return resultList.stream().flatMap(v -> v.stream()).collect(Collectors.toList());
     }
 
-    public int getTableCount(String table_name) {
+    public int getTableCount(String table_name) throws Exception {
         try {
             String query = "select * from server_table_name where table_name = ?";
             Object[] args = {table_name};
@@ -117,7 +112,7 @@ public class DbQueryService {
         }
     }
 
-    public int getDataCount(String table_name) {
+    public int getDataCount(String table_name) throws Exception {
         return jdbcTemplate.queryForObject("select count(*) from " + table_name, Integer.class);
     }
 

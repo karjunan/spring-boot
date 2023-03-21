@@ -28,7 +28,7 @@ public class DBCommandService {
     private DbQueryService dbQueryService;
 
     @Transactional
-    public String createHost(DbCommandDTO dbDTO) {
+    public String createHost(DbCommandDTO dbDTO) throws Exception {
         log.info("service input " + dbDTO);
         Server server = new Server();
         server.setHost(dbDTO.getHost());

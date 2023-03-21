@@ -4,6 +4,7 @@ import com.titaniam.db.dbserver.command.dto.DbCommandDTO;
 import com.titaniam.db.dbserver.command.service.DBCommandService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("cmd/")
 @Slf4j
+@ControllerAdvice
 public class DbCommandController {
 
 
@@ -27,7 +29,7 @@ public class DbCommandController {
     }
 
     @DeleteMapping("/data/{id}")
-    public int deleteServerMessage(@PathVariable String id) {
+    public int deleteServerMessage(@PathVariable String id) throws Exception {
         log.info("controller delete " + id);
         return dbCommandService.deleteHost(id);
     }
