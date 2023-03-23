@@ -1,20 +1,20 @@
 package com.titaniam.db.dbserver.command.service;
 
-import java.sql.Types;
-import java.util.NoSuchElementException;
-import java.util.UUID;
-
 import com.titaniam.db.dbserver.command.dao.entity.Server;
 import com.titaniam.db.dbserver.command.dto.DbCommandDTO;
 import com.titaniam.db.dbserver.exception.TableAlreadyExistsException;
 import com.titaniam.db.dbserver.query.service.DbQueryService;
 import com.titaniam.db.dbserver.util.DbUtil;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.Types;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -28,6 +28,7 @@ public class DBCommandService {
 
     @Autowired
     private DbQueryService dbQueryService;
+
 
     @Transactional
     public String createHost(DbCommandDTO dbDTO) throws Exception {
