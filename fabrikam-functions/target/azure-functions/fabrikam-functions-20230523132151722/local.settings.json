@@ -1,0 +1,12 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "FUNCTIONS_WORKER_RUNTIME": "java"
+  },
+  "Port 7074 Configuration": {
+    "commandName": "Executable",
+    "executablePath": "func",
+    "commandLineArgs": "start --port 7074"
+  }
+}
