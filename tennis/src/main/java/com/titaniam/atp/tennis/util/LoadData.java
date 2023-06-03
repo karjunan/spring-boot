@@ -27,7 +27,7 @@ public class LoadData {
     @Autowired
     private TennisRepository tennisRepository;
 
-    @PostConstruct
+//    @PostConstruct
     private void postConstruct() throws IOException {
 
         File folder = ResourceUtils.getFile("classpath:atp_matches");
